@@ -7,6 +7,8 @@ import { ConnectorNames } from '@ape.swap/uikit'
 import getRpcUrl from 'utils/getRpcUrl'
 import { CHAIN_ID } from 'config/constants/chains'
 import { Web3Provider } from '@ethersproject/providers'
+import { UAuthConnector } from '@uauth/web3-react'
+import UAuth from '@uauth/js'
 
 const POLLING_INTERVAL = 15000
 
@@ -35,12 +37,27 @@ export const walletlink = new WalletLinkConnector({
   appLogoUrl: 'https://apeswap.finance/logo.png',
 })
 
+// Unstoppable Domains Login
+const UD_PRODUCTION_REDIRECT_URI = 'https://apeswap.finance/'
+const UD_DEVELOPMENT_REDIRECT_URI = 'http://localhost:3000'
+const UD_CLIENT_ID = '19016188-8a32-4a76-b38f-94d4593a5d2a'
+
+const uauth = new UAuthConnector({
+  uauth: new UAuth({
+    clientID: UD_CLIENT_ID,
+    redirectUri: UD_DEVELOPMENT_REDIRECT_URI,
+    scope: 'openid wallet',
+  }),
+  connectors: { injected, walletconnect },
+})
+
 export const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.Injected]: injected,
   [ConnectorNames.WalletConnect]: walletconnect,
   [ConnectorNames.BSC]: bscConnector,
   [ConnectorNames.Walletlink]: walletlink,
   [ConnectorNames.Torus]: torus,
+  [ConnectorNames.Unstoppable]: uauth,
 }
 
 export const getLibrary = (provider: any): Web3Provider => {
